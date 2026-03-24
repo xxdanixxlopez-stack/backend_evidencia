@@ -4,12 +4,10 @@ const { requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
 
-// --- PUBLIC: Ver categorías en la página principal ---
+// --- PUBLIC: Ver categorías ---
 router.get("/", async (req, res) => {
   try {
-    // Corregimos el sort para que use 'Nombre' (como está en tu Atlas)
-    // Esto evita que el servidor mande una lista vacía o mal ordenada
-    const data = await Category.find().sort({ Nombre: 1 });
+    const data = await Category.find().sort({ name: 1 });
     res.json(data);
   } catch (e) {
     console.error("categories GET error:", e);
@@ -17,12 +15,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-// --- ADMIN: Crear, Editar y Borrar ---
+// --- ADMIN: Crear ---
 router.post("/", requireAdmin, async (req, res) => {
   try {
-    // Aseguramos que guarde en el campo 'Nombre' sin importar cómo venga del frontend
     const created = await Category.create({ 
-      Nombre: req.body.Nombre || req.body.name 
+      name: req.body.name 
     });
     res.status(201).json(created);
   } catch (e) {
@@ -30,11 +27,12 @@ router.post("/", requireAdmin, async (req, res) => {
   }
 });
 
+// --- ADMIN: Editar ---
 router.put("/:id", requireAdmin, async (req, res) => {
   try {
     const updated = await Category.findByIdAndUpdate(
       req.params.id,
-      { Nombre: req.body.Nombre || req.body.name },
+      { name: req.body.name },
       { new: true, runValidators: true }
     );
     res.json(updated);
@@ -43,6 +41,7 @@ router.put("/:id", requireAdmin, async (req, res) => {
   }
 });
 
+// --- ADMIN: Eliminar ---
 router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     await Category.findByIdAndDelete(req.params.id);
