@@ -2,7 +2,8 @@ const admin = require("firebase-admin");
 
 const ADMIN_EMAILS = [
   "xxdanixxlopez@gmail.com",
-  "bryanfabrizzio33@gmail.com"
+  "bryanfabrizzio33@gmail.com",
+  "thehausebeauty@gmail.com"
 ].map((e) => e.toLowerCase());
 
 // Middleware para usuarios autenticados
