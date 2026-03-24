@@ -4,10 +4,12 @@ const { requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
 
-// PUBLIC
+// --- PUBLIC: Ver categorías en la página principal ---
 router.get("/", async (req, res) => {
   try {
-    const data = await Category.find().sort({ name: 1 });
+    // Corregimos el sort para que use 'Nombre' (como está en tu Atlas)
+    // Esto evita que el servidor mande una lista vacía o mal ordenada
+    const data = await Category.find().sort({ Nombre: 1 });
     res.json(data);
   } catch (e) {
     console.error("categories GET error:", e);
@@ -15,10 +17,13 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ADMIN
+// --- ADMIN: Crear, Editar y Borrar ---
 router.post("/", requireAdmin, async (req, res) => {
   try {
-    const created = await Category.create({ name: req.body.name });
+    // Aseguramos que guarde en el campo 'Nombre' sin importar cómo venga del frontend
+    const created = await Category.create({ 
+      Nombre: req.body.Nombre || req.body.name 
+    });
     res.status(201).json(created);
   } catch (e) {
     res.status(400).json({ message: "Error creando categoría", error: e.message });
@@ -29,7 +34,7 @@ router.put("/:id", requireAdmin, async (req, res) => {
   try {
     const updated = await Category.findByIdAndUpdate(
       req.params.id,
-      { name: req.body.name },
+      { Nombre: req.body.Nombre || req.body.name },
       { new: true, runValidators: true }
     );
     res.json(updated);
